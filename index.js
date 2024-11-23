@@ -9,45 +9,45 @@ const randomSleep = async () => {
 
 async function scrapeMuscleGroups() {
     const browser = await puppeteer.launch({
-        headless: false, // Makes the browser visible
-        defaultViewport: null, // Allows the viewport to be full size
+        // headless: false, // Makes the browser visible
+        // defaultViewport: null, // Allows the viewport to be full size
     });
     const page = await browser.newPage();
     
-    await randomSleep();
+    // await randomSleep();
     await page.goto('https://www.muscleandstrength.com/exercises/');
-    await randomSleep();
+    // await randomSleep();
 
     const muscleGroupData = {};
 
     // Get all muscle group links from main page
-    const muscleGroupLinks = await page.$$eval('a[href*="/exercises/"]', links => {
-        const uniqueLinks = new Map();
-        links.forEach(link => {
-            const name = link.textContent.trim();
-            const url = link.href;
-            if (!uniqueLinks.has(url)) {
-                uniqueLinks.set(url, { name, url });
-            }
-        });
-        return Array.from(uniqueLinks.values());
-    });
+    const muscleGroupLinks = await page.$$eval(
+        '.mainpage-category-list.exercise-category-list:first-of-type .grid-x .cell',
+        cells => cells.map(cell => {
+            const img = cell.querySelector('a img');
+            const imageUrl = img.getAttribute('src') || img.getAttribute('data-src') || img.getAttribute('data-original');
+            const name = cell.querySelector('.category-name').textContent.trim();
+            const url = cell.querySelector('a').href;
+            return { name, url, imageUrl };
+        })
+    );
+    
 
-    for (const muscleGroup of muscleGroupLinks) {
-        await randomSleep();
-        muscleGroupData[muscleGroup.name] = {
-            name: muscleGroup.name,
-            imageUrl: '', // Will be populated from exercise page
-            exercises: []
-        };
+    // for (const muscleGroup of muscleGroupLinks) {
+    //     await randomSleep();
+    //     muscleGroupData[muscleGroup.name] = {
+    //         name: muscleGroup.name,
+    //         imageUrl: '', // Will be populated from exercise page
+    //         exercises: []
+    //     };
 
-        await scrapeExercisesForMuscleGroup(page, muscleGroup.url, muscleGroupData[muscleGroup.name]);
-    }
+    //     await scrapeExercisesForMuscleGroup(page, muscleGroup.url, muscleGroupData[muscleGroup.name]);
+    // }
 
-    await browser.close();
+    // await browser.close();
 
-    // Save to file
-    fs.writeFileSync('musclefitnessdata.json', JSON.stringify(muscleGroupData, null, 2));
+    // // Save to file
+    // fs.writeFileSync('musclefitnessdata.json', JSON.stringify(muscleGroupData, null, 2));
 }
 
 async function scrapeExercisesForMuscleGroup(page, muscleGroupUrl, muscleGroupData) {
