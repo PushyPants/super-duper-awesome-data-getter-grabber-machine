@@ -1,0 +1,15 @@
+{
+  "name": "musclefitnessscraper",
+  "version": "1.0.0",
+  "description": "It's pretty much a super duper awesome data getter grabber machine - that's awesome, super duperly speaking",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^23.9.0"
+  }
+}
